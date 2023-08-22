@@ -8,15 +8,13 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamlist } from "../components/StackNavigator";
 import { LinearGradient } from "expo-linear-gradient";
 
-type logincreenProp = NativeStackNavigationProp<RootStackParamlist, 'LogIn'>
-
+type logincreenProp = NativeStackNavigationProp<RootStackParamlist, "LogIn">;
 
 const LogInScreen = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
 
   const navigation = useNavigation<logincreenProp>();
-  
 
   return (
     <SafeAreaView>
@@ -34,7 +32,7 @@ const LogInScreen = () => {
           </Pressable>
 
           <Pressable
-            className="absolute bottom-[10px] w-[60px] h-[60px]"
+            className="absolute bottom-[10px] w-[61px] h-[60px]"
             onPress={() => signOut()}
           >
             <Image
@@ -47,8 +45,9 @@ const LogInScreen = () => {
       </SignedIn>
       <SignedOut>
         <LinearGradient
-          colors={['#660066', '#CC99FF']}
-          className="bg-[#34353F] w-screen h-screen flex flex-col items-center justify-center hover:opacity-50">
+          colors={["#660066", "#CC99FF"]}
+          className="bg-[#34353F] w-screen h-screen flex flex-col items-center justify-center hover:opacity-50"
+        >
           <Text className="text-[#B3C7D6] text-[60px]">Vocab App</Text>
           <SignInWithOAuth />
         </LinearGradient>

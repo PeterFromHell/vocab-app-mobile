@@ -1,17 +1,42 @@
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useState } from "react";
+import React, {
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import { View, Text, Modal, TextInput, Pressable } from "react-native";
 
-type Props = {
-  handleCond: boolean;
-};
+interface PopupWindowProps {
+  closePopup: () => void
+}
 
-const CreateListPopupWindow: React.FC<Props> = ({ handleCond }: Props) => {
-  const [isVisible, setIsVisible] = React.useState<boolean>(handleCond);
-  const [prompt, setPrompt] = React.useState<string>("");
-  console.log(isVisible);
+export interface PopupWindowMethods {
+  open: () => void
+  close: () => void
+}
+const CreateListPopupWindow:React.ForwardRefRenderFunction<PopupWindowMethods, PopupWindowProps> = (props,ref) => {
+  const prompt = "";
+
+  const [isOpen, setIsOpen] = useState(false);
+
+  const open = () => {
+    setIsOpen(true);
+  };
+  const close = () => {
+    setIsOpen(false);
+  };
+  useImperativeHandle(ref, () => ({
+    open,
+    close,
+  }));
+
+const handleInternalClose = () => {
+  props.closePopup()
+}
+
   return (
-    <Modal animationType="slide" transparent={false} visible={isVisible}>
+    <Modal animationType="slide" transparent={false} visible={isOpen ? true : false}>
       <LinearGradient
         colors={["#003366", "#66CCFF"]}
         className="w-full h-full flex items-center justify-center"
@@ -27,11 +52,11 @@ const CreateListPopupWindow: React.FC<Props> = ({ handleCond }: Props) => {
               value={prompt}
             />
 
-            <View className="flex flex-row items-center justify-end space-x-2 mx-2">
+            <View className="border w-[350px] flex flex-row items-center justify-end space-x-4 mx-2">
               <Pressable className="w-[90px] h-[40px] border bg-[#003366] rounded-md flex items-center justify-center">
                 <Text className="text-white text-[20px]">Create</Text>
-              </Pressable>
-              <Pressable className="w-[90px] h-[40px] border bg-transparent rounded-md flex items-center justify-center">
+              </Pressable>    
+              <Pressable className="w-[90px] h-[40px] border bg-transparent rounded-md flex items-center justify-center" onPress={handleInternalClose}>
                 <Text className="text-[#003366] text-[20px]">Cancel</Text>
               </Pressable>
             </View>
@@ -42,4 +67,5 @@ const CreateListPopupWindow: React.FC<Props> = ({ handleCond }: Props) => {
   );
 };
 
-export default CreateListPopupWindow;
+
+export default forwardRef(CreateListPopupWindow);

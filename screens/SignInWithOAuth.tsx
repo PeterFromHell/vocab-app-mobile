@@ -28,7 +28,7 @@ const SignInWithOAuth = () => {
   }, []);
 
   return (
-    <View className="w-[300px] h-[60px] border border-white rounded-xl bg-[#98FF98] flex items-center justify-center">
+    <View className="w-[300px] h-[60px] border border-white rounded-xl bg-[#CC99FF] flex items-center justify-center">
       <Text className="text-[#000000] text-[30px]" onPress={() => onPress()}>
         Log in to Get Started
       </Text>

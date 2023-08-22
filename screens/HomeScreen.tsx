@@ -2,17 +2,27 @@ import { useAuth, useUser } from "@clerk/clerk-expo";
 import NewList from "./NewList";
 import { LinearGradient } from "expo-linear-gradient";
 
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { View, Text } from "react-native";
-import CreateListPopupWindow from "./CreateListPopupWindow";
+import CreateListPopupWindow, {PopupWindowMethods} from "./CreateListPopupWindow";
 
 const HomeScreen = () => {
   const { user } = useUser();
-  const [isPopup, setIsPopup] = React.useState<boolean>(false);
 
-  const popupWindow = () => {
-    setIsPopup(true);
-    console.log(isPopup);
+  const popupRef = useRef<PopupWindowMethods | null>(null);
+  const openPopup = () => {
+    if (popupRef.current) {
+      popupRef.current.open();
+    }
+  };
+  const closePopup = () => {
+    if (popupRef.current) {
+      popupRef.current.close();
+    }
+  };
+
+  const openPopupWindow = () => {
+    openPopup();
   };
 
   return (
@@ -21,8 +31,8 @@ const HomeScreen = () => {
       className="w-full h-full flex flex-col items-center justify-center"
     >
       <Text className="text-[#B7C6D4] text-[100px] absolute top-0">Vocabs</Text>
-      <CreateListPopupWindow handleCond={isPopup} />
-      <NewList handleClick={popupWindow} />
+      <CreateListPopupWindow ref={popupRef as React.RefObject<PopupWindowMethods>} closePopup={closePopup} />
+      <NewList handleClick={openPopupWindow} />
     </LinearGradient>
   );
 };
