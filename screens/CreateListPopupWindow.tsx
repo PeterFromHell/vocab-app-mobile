@@ -1,4 +1,7 @@
+import { useUser } from "@clerk/clerk-expo";
 import { LinearGradient } from "expo-linear-gradient";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { db } from "../firebase";
 import React, {
   forwardRef,
   useImperativeHandle,
@@ -6,17 +9,26 @@ import React, {
   useState,
 } from "react";
 import { View, Text, Modal, TextInput, Pressable } from "react-native";
+import { List } from "../typings";
+import { useNavigation } from "@react-navigation/native";
+import { NavigationProp } from "@react-navigation/native";
 
 interface PopupWindowProps {
-  closePopup: () => void
+  closePopup: () => void;
+  navigation: any;
 }
 
 export interface PopupWindowMethods {
-  open: () => void
-  close: () => void
+  open: () => void;
+  close: () => void;
 }
-const CreateListPopupWindow:React.ForwardRefRenderFunction<PopupWindowMethods, PopupWindowProps> = (props,ref) => {
-  const prompt = "";
+const CreateListPopupWindow: React.ForwardRefRenderFunction<
+  PopupWindowMethods,
+  PopupWindowProps
+> = (props, ref) => {
+  const [prompt, setPrompt] = useState<string>("");
+  const [submittedValue, setSubmittedValue] = useState("");
+  const { user } = useUser();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -31,12 +43,43 @@ const CreateListPopupWindow:React.ForwardRefRenderFunction<PopupWindowMethods, P
     close,
   }));
 
-const handleInternalClose = () => {
-  props.closePopup()
-}
+  const handleInternalClose = () => {
+    props.closePopup();
+  };
+  const handleSubmit = async () => {
+    setSubmittedValue(prompt);
+    setPrompt("");
+    props.closePopup();
+
+    const list: List = {
+      name: prompt.trim(),
+      createdAt: serverTimestamp(),
+      user: {
+        _id: user?.primaryEmailAddress!.toString()!,
+        name: user?.username!,
+        avatar:
+          user?.imageUrl ||
+          `https://ui-avatars.com/api/?name=${user?.username}`,
+      },
+    };
+
+    const doc = await addDoc(
+      collection(db, "users", user?.primaryEmailAddress?.toString()!, "lists"),
+      list
+    );
+    props.navigation.navigate("List", { list: prompt });
+  };
+
+  const handleInputChange = (text: string) => {
+    setPrompt(text);
+  };
 
   return (
-    <Modal animationType="slide" transparent={false} visible={isOpen ? true : false}>
+    <Modal
+      animationType="slide"
+      transparent={false}
+      visible={isOpen ? true : false}
+    >
       <LinearGradient
         colors={["#003366", "#66CCFF"]}
         className="w-full h-full flex items-center justify-center"
@@ -50,13 +93,20 @@ const handleInternalClose = () => {
               className="w-[350px] h-[50px] border-[#CCCCCC] border-[1px] rounded-md placeholder-[#000000]"
               placeholder="List Name"
               value={prompt}
+              onChangeText={handleInputChange}
             />
 
-            <View className="border w-[350px] flex flex-row items-center justify-end space-x-4 mx-2">
-              <Pressable className="w-[90px] h-[40px] border bg-[#003366] rounded-md flex items-center justify-center">
+            <View className="flex flex-row items-center justify-end space-x-4 mx-2">
+              <Pressable
+                className="w-[90px] h-[40px] border bg-[#003366] rounded-md flex items-center justify-center"
+                onPress={handleSubmit}
+              >
                 <Text className="text-white text-[20px]">Create</Text>
-              </Pressable>    
-              <Pressable className="w-[90px] h-[40px] border bg-transparent rounded-md flex items-center justify-center" onPress={handleInternalClose}>
+              </Pressable>
+              <Pressable
+                className="w-[90px] h-[40px] border bg-transparent rounded-md flex items-center justify-center"
+                onPress={handleInternalClose}
+              >
                 <Text className="text-[#003366] text-[20px]">Cancel</Text>
               </Pressable>
             </View>
@@ -66,6 +116,5 @@ const handleInternalClose = () => {
     </Modal>
   );
 };
-
 
 export default forwardRef(CreateListPopupWindow);

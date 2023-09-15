@@ -8,13 +8,13 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { RootStackParamlist } from "../components/StackNavigator";
 import { LinearGradient } from "expo-linear-gradient";
 
-type logincreenProp = NativeStackNavigationProp<RootStackParamlist, "LogIn">;
+type loginScreenProp = NativeStackNavigationProp<RootStackParamlist, "LogIn">;
 
 const LogInScreen = () => {
   const { user } = useUser();
   const { signOut } = useAuth();
 
-  const navigation = useNavigation<logincreenProp>();
+  const navigation = useNavigation<loginScreenProp>();
 
   return (
     <SafeAreaView>
